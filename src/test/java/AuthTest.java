@@ -2,6 +2,7 @@ import com.codeborne.selenide.Condition;
 import data.ClientInfo;
 import org.junit.jupiter.api.Test;
 
+import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
@@ -23,7 +24,7 @@ public class AuthTest {
         $("[name = \"login\"]").setValue(info.getLogin());
         $("[name = \"password\"]").setValue(info.getPassword());
         $("[data-test-id=\"action-login\"]").click();
-        $(".heading").shouldBe(visible);
+        $(".heading").shouldBe(visible).shouldHave(text("  Личный кабинет"));
 
     }
 
@@ -38,7 +39,7 @@ public class AuthTest {
         $("[name = \"login\"]").setValue(info.getLogin());
         $("[name = \"password\"]").setValue(info.getPassword());
         $("[data-test-id=\"action-login\"]").click();
-        $("[data-test-id=\"error-notification\"]").shouldBe(visible);
+        $("[data-test-id=\"error-notification\"]").shouldBe(visible).shouldHave(text("Пользователь заблокирован"));
 
     }
 
@@ -54,7 +55,7 @@ public class AuthTest {
         $("[name = \"login\"]").setValue(info.getLogin());
         $("[name = \"password\"]").setValue(invalidPassword);
         $("[data-test-id=\"action-login\"]").click();
-        $(".notification__content").shouldHave(Condition.text("Неверно указан логин или пароль")).shouldBe(visible);
+        $(".notification__content").shouldBe(visible).shouldHave(Condition.text("Неверно указан логин или пароль"));
 
 
     }
@@ -71,7 +72,19 @@ public class AuthTest {
         $("[name = \"login\"]").setValue(invalidLogin);
         $("[name = \"password\"]").setValue(info.getPassword());
         $("[data-test-id=\"action-login\"]").click();
-        $(".notification__content").shouldHave(Condition.text("Неверно указан логин или пароль")).shouldBe(visible);
+        $(".notification__content").shouldBe(visible).shouldHave(Condition.text("Неверно указан логин или пароль"));
+
+    }
+
+
+    @Test
+    void checkLoginUnregisteredUser() {
+
+        open("http://localhost:9999/");
+        $("[name = \"login\"]").setValue(DataGenerator.Authorization.generateInvalidLogin("us"));
+        $("[name = \"password\"]").setValue(DataGenerator.Authorization.generateInvalidPassword("us"));
+        $("[data-test-id=\"action-login\"]").click();
+        $(".notification__content").shouldBe(visible).shouldHave(Condition.text("Неверно указан логин или пароль"));
 
     }
 
